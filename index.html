@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speed Tracker</title>
+<style>
+    *{
+        padding: 0px;
+        margin: 0px;
+        font-family: sans-serif;
+    }
+    .parent{
+        text-align: center;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 100vh;
+    }
+    .parent h1{
+        margin:20px 0px 10px 0px;
+    }
+    .parent p{
+        margin:10px 0px 10px 0px;
+    }
+    .parent button{
+        margin:10px 0px 10px 0px;
+        padding: 10px;
+        outline: none;
+        border-style: none;
+        background-color: aqua;
+    }
+    #speed {
+        font-size: 24px;
+    }
+    body{
+        background-color: rgb(17, 1, 40);
+    }
+</style>
+</head>
+<body>
+<div class="parent"> 
+    <h1 >Speed Tracker</h1>
+    <p>Your current speed: <span id="speed">Waiting for data...</span> m/s</p>
+    <p>Your current speed: <span id="speedInKm">0 Km/hr</span></p>
+    <p>Your Accuracy: <span id="accuracy"></span>0000</p>
+    <button onclick="startTracking()">Start Tracking</button>
+    <button onclick="stopTracking()">Stop Tracking</button>
+</div>
+
+<script>
+let watchId;
+
+function startTracking() {
+    if (navigator.geolocation) {
+        watchId = navigator.geolocation.watchPosition(showSpeed, showError);
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+}
+
+function stopTracking() {
+    if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+        document.getElementById('speed').innerText = "Tracking stopped";
+    }
+}
+
+function showSpeed(position) {
+    if (position.coords.speed === null) {
+        document.getElementById('speed').textContent = "Speed data not available";
+        let accuracy = document.getElementById('accuracy')
+        accuracy.textContent = ""
+        accuracy.textContent = position.coords.accuracy;
+    } else {
+        document.getElementById('speed').textContent = position.coords.speed;
+        document.getElementById('speedInKm').textContent = "";
+        document.getElementById('speedInKm').textContent = Math.round(position.coords.speed * 18 / 5) + " Km/hr";
+        let accuracy = document.getElementById('accuracy')
+        accuracy.textContent = ""
+        accuracy.textContent = position.coords.accuracy;
+    }
+}
+
+function showError(error) {
+    switch(error.code) {
+        case error.PERMISSION_DENIED:
+            alert("User denied the request for Geolocation.");
+            break;
+        case error.POSITION_UNAVAILABLE:
+            alert("Location information is unavailable.");
+            break;
+        case error.TIMEOUT:
+            alert("The request to get user location timed out.");
+            break;
+        case error.UNKNOWN_ERROR:
+            alert("An unknown error occurred.");
+            break;
+    }
+}
+</script>
+</body>
+</html>
